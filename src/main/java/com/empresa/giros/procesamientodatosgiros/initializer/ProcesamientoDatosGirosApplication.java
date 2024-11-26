@@ -1,6 +1,5 @@
 package com.empresa.giros.procesamientodatosgiros.initializer;
 
-import com.empresa.giros.procesamientodatosgiros.excel.ExcelExporter;
 import com.empresa.giros.procesamientodatosgiros.excel.ExcelProcessor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -11,8 +10,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.empresa.giros.procesamientodatosgiros"})
@@ -37,8 +34,8 @@ public class ProcesamientoDatosGirosApplication {
         public void run(String... args) {
             try {
                 // Ruta al archivo Excel de entrada y salida
-                String rutaArchivo = "C:/Bloques de Construccion/giro-directo-discriminado-capita-y-evento-noviembre-2024.xlsx";
-                String fecha = "2024-11-01";
+                String rutaArchivo = "C:/Bloques de Construccion/giro-directo-discriminado-capita-y-evento-noviembre-2023.xlsx";
+                String fecha = "2023-11-30";
 
                 // Procesar el archivo Excel
                 processor.procesarArchivoYGuardar(rutaArchivo, fecha);

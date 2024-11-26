@@ -21,9 +21,6 @@ public class GiroEntity extends BaseEntity {
     @Column(name = "forma_contratacion")
     private String formaContratacion;
 
-    @Column(name = "valor_ordenado")
-    private Double valorOrdenado;
-
     @Column(name = "total_giro")
     private Double totalGiro;
 
@@ -63,14 +60,6 @@ public class GiroEntity extends BaseEntity {
 
     public void setFormaContratacion(String formaContratacion) {
         this.formaContratacion = formaContratacion;
-    }
-
-    public Double getValorOrdenado() {
-        return valorOrdenado;
-    }
-
-    public void setValorOrdenado(Double valorOrdenado) {
-        this.valorOrdenado = valorOrdenado;
     }
 
     public Double getTotalGiro() {

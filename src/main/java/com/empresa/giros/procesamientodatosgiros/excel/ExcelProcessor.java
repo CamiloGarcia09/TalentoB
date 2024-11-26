@@ -72,7 +72,6 @@ public class ExcelProcessor {
             giro.setIpsEntity(ips);
             giro.setUbicacionEntity(ubicacion);
             giro.setFormaContratacion(obtenerValorOAsignarDefault(registro.get("FORMA_CONTRATACION")));
-            giro.setValorOrdenado(parseDouble(registro.get("VALOR_ORDENADO")));
             giro.setTotalGiro(parseDouble(registro.get("TOTAL_GIRO")));
             giro.setObservaciones(obtenerValorOAsignarDefault(registro.get("OBSERVACIONES")));
             giro.setFecha(fecha);
@@ -83,6 +82,7 @@ public class ExcelProcessor {
 
     private List<Map<String, String>> procesarArchivo(String rutaArchivo, String fecha) throws IOException {
         Workbook workbook = WorkbookFactory.create(new File(rutaArchivo));
+
         List<Map<String, String>> registros = new ArrayList<>();
 
         // Procesar hojas y agregar registros
@@ -110,18 +110,16 @@ public class ExcelProcessor {
                 registro.put("NIT_EPS", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(5))));
                 registro.put("NOMBRE_IPS", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(6))));
                 registro.put("FORMA_CONTRATACION", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(7))));
-                registro.put("VALOR_ORDENADO", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(8))));
-                registro.put("TOTAL_GIRO", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(9))));
-                registro.put("OBSERVACIONES", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(10))));
+                registro.put("TOTAL_GIRO", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(8))));
+                registro.put("OBSERVACIONES", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(9))));
             } else {
                 registro.put("COD_EPS", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(0))));
                 registro.put("NOMBRE_EPS", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(1))));
                 registro.put("NIT_EPS", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(2))));
                 registro.put("NOMBRE_IPS", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(3))));
                 registro.put("FORMA_CONTRATACION", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(4))));
-                registro.put("VALOR_ORDENADO", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(5))));
-                registro.put("TOTAL_GIRO", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(6))));
-                registro.put("OBSERVACIONES", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(7))));
+                registro.put("TOTAL_GIRO", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(5))));
+                registro.put("OBSERVACIONES", obtenerValorOAsignarDefault(obtenerValorCelda(fila.getCell(6))));
             }
             registro.put("FECHA", fecha);
             registros.add(registro);
@@ -142,13 +140,26 @@ public class ExcelProcessor {
 
     private String obtenerValorCelda(Cell celda) {
         if (celda == null) return null;
+
+        FormulaEvaluator evaluator = celda.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
+
         return switch (celda.getCellType()) {
             case STRING -> celda.getStringCellValue().trim();
-            case NUMERIC -> String.valueOf((long) celda.getNumericCellValue());
+            case NUMERIC -> String.valueOf(celda.getNumericCellValue());
             case BOOLEAN -> String.valueOf(celda.getBooleanCellValue());
+            case FORMULA -> {
+                CellValue evaluado = evaluator.evaluate(celda);
+                yield switch (evaluado.getCellType()) {
+                    case STRING -> evaluado.getStringValue().trim();
+                    case NUMERIC -> String.valueOf(evaluado.getNumberValue());
+                    case BOOLEAN -> String.valueOf(evaluado.getBooleanValue());
+                    default -> null;
+                };
+            }
             default -> null;
         };
     }
+
 
     private Double parseDouble(String valor) {
         if (valor == null || valor.isBlank()) return 0.0;
