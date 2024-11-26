@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "giros")
-public class GiroEntity extends BaseEntity {
+public final class GiroEntity extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "eps_id", nullable = false)
@@ -34,7 +34,7 @@ public class GiroEntity extends BaseEntity {
         return epsEntity;
     }
 
-    public void setEpsEntity(EpsEntity epsEntity) {
+    public void setEpsEntity(final EpsEntity epsEntity) {
         this.epsEntity = epsEntity;
     }
 
@@ -42,7 +42,7 @@ public class GiroEntity extends BaseEntity {
         return ipsEntity;
     }
 
-    public void setIpsEntity(IpsEntity ipsEntity) {
+    public void setIpsEntity(final IpsEntity ipsEntity) {
         this.ipsEntity = ipsEntity;
     }
 
@@ -50,7 +50,7 @@ public class GiroEntity extends BaseEntity {
         return ubicacionEntity;
     }
 
-    public void setUbicacionEntity(UbicacionEntity ubicacionEntity) {
+    public void setUbicacionEntity(final UbicacionEntity ubicacionEntity) {
         this.ubicacionEntity = ubicacionEntity;
     }
 
@@ -58,7 +58,7 @@ public class GiroEntity extends BaseEntity {
         return formaContratacion;
     }
 
-    public void setFormaContratacion(String formaContratacion) {
+    public void setFormaContratacion(final String formaContratacion) {
         this.formaContratacion = formaContratacion;
     }
 
@@ -66,7 +66,7 @@ public class GiroEntity extends BaseEntity {
         return totalGiro;
     }
 
-    public void setTotalGiro(Double totalGiro) {
+    public void setTotalGiro(final Double totalGiro) {
         this.totalGiro = totalGiro;
     }
 
@@ -74,7 +74,7 @@ public class GiroEntity extends BaseEntity {
         return observaciones;
     }
 
-    public void setObservaciones(String observaciones) {
+    public void setObservaciones(final String observaciones) {
         this.observaciones = observaciones;
     }
 
@@ -82,10 +82,8 @@ public class GiroEntity extends BaseEntity {
         return fecha;
     }
 
-    public void setFecha(String fecha) {
+    public void setFecha(final String fecha) {
         this.fecha = fecha;
     }
-
-    // Getters y setters
 }
 

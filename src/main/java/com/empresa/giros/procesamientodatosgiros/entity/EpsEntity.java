@@ -6,7 +6,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "eps")
-public class EpsEntity extends BaseEntity {
+public final class EpsEntity extends BaseEntity {
 
     @Column(name = "cod_eps", nullable = false, unique = true)
     private String codEps;
@@ -18,7 +18,7 @@ public class EpsEntity extends BaseEntity {
         return codEps;
     }
 
-    public void setCodEps(String codEps) {
+    public void setCodEps(final String codEps) {
         this.codEps = codEps;
     }
 
@@ -26,7 +26,7 @@ public class EpsEntity extends BaseEntity {
         return nombreEps;
     }
 
-    public void setNombreEps(String nombreEps) {
+    public void setNombreEps(final String nombreEps) {
         this.nombreEps = nombreEps;
     }
 }

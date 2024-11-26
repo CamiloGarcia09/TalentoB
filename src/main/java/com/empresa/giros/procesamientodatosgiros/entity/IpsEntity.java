@@ -6,7 +6,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "ips")
-public class IpsEntity extends BaseEntity {
+public final class IpsEntity extends BaseEntity {
 
     @Column(name = "nit_ips", nullable = false, unique = true)
     private String nitIps;
@@ -18,7 +18,7 @@ public class IpsEntity extends BaseEntity {
         return nitIps;
     }
 
-    public void setNitIps(String nitIps) {
+    public void setNitIps(final String nitIps) {
         this.nitIps = nitIps;
     }
 
@@ -26,7 +26,7 @@ public class IpsEntity extends BaseEntity {
         return nombreIps;
     }
 
-    public void setNombreIps(String nombreIps) {
+    public void setNombreIps(final String nombreIps) {
         this.nombreIps = nombreIps;
     }
 }

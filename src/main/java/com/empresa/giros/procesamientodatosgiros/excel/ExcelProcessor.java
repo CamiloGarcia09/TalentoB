@@ -1,13 +1,5 @@
 package com.empresa.giros.procesamientodatosgiros.excel;
 
-import com.empresa.giros.procesamientodatosgiros.entity.EpsEntity;
-import com.empresa.giros.procesamientodatosgiros.entity.GiroEntity;
-import com.empresa.giros.procesamientodatosgiros.entity.IpsEntity;
-import com.empresa.giros.procesamientodatosgiros.entity.UbicacionEntity;
-import com.empresa.giros.procesamientodatosgiros.repository.EpsRepository;
-import com.empresa.giros.procesamientodatosgiros.repository.GiroRepository;
-import com.empresa.giros.procesamientodatosgiros.repository.IpsRepository;
-import com.empresa.giros.procesamientodatosgiros.repository.UbicacionRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Component;
 
@@ -16,76 +8,12 @@ import java.io.IOException;
 import java.util.*;
 
 @Component
-public class ExcelProcessor {
+public final class ExcelProcessor {
 
-    private final EpsRepository epsRepository;
-    private final IpsRepository ipsRepository;
-    private final UbicacionRepository ubicacionRepository;
-    private final GiroRepository giroRepository;
-
-    public ExcelProcessor(EpsRepository epsRepository,
-                          IpsRepository ipsRepository,
-                          UbicacionRepository ubicacionRepository,
-                          GiroRepository giroRepository) {
-        this.epsRepository = epsRepository;
-        this.ipsRepository = ipsRepository;
-        this.ubicacionRepository = ubicacionRepository;
-        this.giroRepository = giroRepository;
-    }
-
-    public void procesarArchivoYGuardar(String rutaArchivo, String fecha) throws IOException {
-        List<Map<String, String>> registros = procesarArchivo(rutaArchivo, fecha);
-
-        for (Map<String, String> registro : registros) {
-
-            // Guardar EPS
-            EpsEntity eps = epsRepository.findByCodEps(obtenerValorOAsignarDefault(registro.get("COD_EPS")))
-                    .orElseGet(() -> {
-                        EpsEntity nuevaEps = new EpsEntity();
-                        nuevaEps.setCodEps(obtenerValorOAsignarDefault(registro.get("COD_EPS")));
-                        nuevaEps.setNombreEps(obtenerValorOAsignarDefault(registro.get("NOMBRE_EPS")));
-                        return epsRepository.save(nuevaEps);
-                    });
-
-            // Guardar IPS
-            IpsEntity ips = ipsRepository.findByNitIps(obtenerValorOAsignarDefault(registro.get("NIT_EPS")))
-                    .orElseGet(() -> {
-                        IpsEntity nuevaIps = new IpsEntity();
-                        nuevaIps.setNitIps(obtenerValorOAsignarDefault(registro.get("NIT_EPS")));
-                        nuevaIps.setNombreIps(obtenerValorOAsignarDefault(registro.get("NOMBRE_IPS")));
-                        return ipsRepository.save(nuevaIps);
-                    });
-
-            // Guardar ubicación
-            UbicacionEntity ubicacion = ubicacionRepository.findByDane(obtenerValorOAsignarDefault(registro.get("DANE")))
-                    .orElseGet(() -> {
-                        UbicacionEntity nuevaUbicacion = new UbicacionEntity();
-                        nuevaUbicacion.setDane(obtenerValorOAsignarDefault(registro.get("DANE")));
-                        nuevaUbicacion.setDepartamento(obtenerValorOAsignarDefault(registro.get("DEPARTAMENTO")));
-                        nuevaUbicacion.setMunicipio(obtenerValorOAsignarDefault(registro.get("MUNICIPIO")));
-                        return ubicacionRepository.save(nuevaUbicacion);
-                    });
-
-            // Guardar giro
-            GiroEntity giro = new GiroEntity();
-            giro.setEpsEntity(eps);
-            giro.setIpsEntity(ips);
-            giro.setUbicacionEntity(ubicacion);
-            giro.setFormaContratacion(obtenerValorOAsignarDefault(registro.get("FORMA_CONTRATACION")));
-            giro.setTotalGiro(parseDouble(registro.get("TOTAL_GIRO")));
-            giro.setObservaciones(obtenerValorOAsignarDefault(registro.get("OBSERVACIONES")));
-            giro.setFecha(fecha);
-
-            giroRepository.save(giro);
-        }
-    }
-
-    private List<Map<String, String>> procesarArchivo(String rutaArchivo, String fecha) throws IOException {
+    public List<Map<String, String>> procesarArchivo(final String rutaArchivo, final String fecha) throws IOException {
         Workbook workbook = WorkbookFactory.create(new File(rutaArchivo));
-
         List<Map<String, String>> registros = new ArrayList<>();
 
-        // Procesar hojas y agregar registros
         registros.addAll(procesarHoja(workbook.getSheetAt(0), fecha, true));
         registros.addAll(procesarHoja(workbook.getSheetAt(1), fecha, false));
 
@@ -93,12 +21,12 @@ public class ExcelProcessor {
         return registros;
     }
 
-    private List<Map<String, String>> procesarHoja(Sheet hoja, String fecha, boolean esHoja1) {
+    private List<Map<String, String>> procesarHoja(final Sheet hoja, final String fecha, final boolean esHoja1) {
         List<Map<String, String>> registros = new ArrayList<>();
 
         for (Row fila : hoja) {
-            if (fila.getRowNum() < 8) continue; // Saltar encabezados
-            if (esFilaTotalONota(fila)) break; // Detener al encontrar TOTAL o NOTA
+            if (fila.getRowNum() < 8) continue;
+            if (esFilaTotalONota(fila)) break;
 
             Map<String, String> registro = new HashMap<>();
             if (esHoja1) {
@@ -128,7 +56,8 @@ public class ExcelProcessor {
         return registros;
     }
 
-    private boolean esFilaTotalONota(Row fila) {
+
+    private boolean esFilaTotalONota(final Row fila) {
         for (Cell celda : fila) {
             String valor = obtenerValorCelda(celda);
             if (valor != null && (valor.equalsIgnoreCase("TOTAL") || valor.equalsIgnoreCase("NOTA"))) {
@@ -138,7 +67,7 @@ public class ExcelProcessor {
         return false;
     }
 
-    private String obtenerValorCelda(Cell celda) {
+    private String obtenerValorCelda(final Cell celda) {
         if (celda == null) return null;
 
         FormulaEvaluator evaluator = celda.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
@@ -160,17 +89,9 @@ public class ExcelProcessor {
         };
     }
 
-
-    private Double parseDouble(String valor) {
-        if (valor == null || valor.isBlank()) return 0.0;
-        try {
-            return Double.parseDouble(valor);
-        } catch (NumberFormatException e) {
-            return 0.0;
-        }
-    }
-
-    private String obtenerValorOAsignarDefault(String valor) {
+    private String obtenerValorOAsignarDefault(final String valor) {
         return (valor == null || valor.isBlank()) ? "N/A" : valor;
     }
 }
+
+
